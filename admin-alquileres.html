@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Alquileres — Eckerdt Inmobiliaria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f2eb;--paper:#fffef9;--ink:#1a1a18;--ink2:#4a4a42;--ink3:#8a8a7a;
+  --accent:#c8420a;--green:#2a6b3c;--warn:#b8860b;--border:#d8d4c8;
+}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:13px}
+.app{display:flex;min-height:100vh}
+.sidebar{width:220px;min-height:100vh;background:var(--ink);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100}
+.logo{padding:24px 18px 16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.logo-t{font-family:'Libre Baskerville',serif;font-size:14px;font-weight:700;color:#fff;line-height:1.4}
+.logo-s{font-size:10px;color:rgba(255,255,255,.35);margin-top:4px;letter-spacing:1px;text-transform:uppercase}
+.nav{list-style:none;padding:10px 0;flex:1}
+.nav li{display:flex;align-items:center;gap:9px;padding:10px 18px;cursor:pointer;font-size:11px;color:rgba(255,255,255,.5);border-left:2px solid transparent;transition:all .15s;letter-spacing:.3px}
+.nav li:hover{color:#fff;background:rgba(255,255,255,.05)}
+.nav li.on{color:#fff;border-left-color:var(--accent);background:rgba(200,66,10,.12)}
+.nav li .ic{font-size:14px;width:18px;text-align:center}
+.sidebar-foot{padding:14px 18px;border-top:1px solid rgba(255,255,255,.08);font-size:10px;color:rgba(255,255,255,.2);letter-spacing:.5px}
+.main{margin-left:220px;flex:1;padding:28px 32px}
+.ph{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;padding-bottom:14px;border-bottom:2px solid var(--ink)}
+.pt{font-family:'Libre Baskerville',serif;font-size:24px;font-weight:700}
+.ps{font-size:10px;color:var(--ink3);margin-top:3px;letter-spacing:.5px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;cursor:pointer;border:2px solid var(--ink);background:var(--ink);color:#fff;letter-spacing:.5px;transition:all .15s}
+.btn:hover{background:var(--accent);border-color:var(--accent)}
+.btn.out{background:transparent;color:var(--ink)}
+.btn.out:hover{background:var(--ink);color:#fff}
+.btn.grn{background:var(--green);border-color:var(--green)}
+.btn.grn:hover{opacity:.85}
+.btn.sm{padding:4px 10px;font-size:10px}
+.kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.kcard{background:var(--paper);border:1px solid var(--border);padding:16px;border-top:3px solid}
+.klbl{font-size:10px;color:var(--ink3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.kval{font-size:22px;font-weight:600;font-family:'Libre Baskerville',serif;line-height:1}
+.ksub{font-size:10px;color:var(--ink3);margin-top:5px}
+.alerts{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.alert{display:flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--border);border-left:3px solid;padding:10px 14px;font-size:11px}
+.alert strong{display:block;font-size:11px;color:var(--ink)}
+.alert span{font-size:10px;color:var(--ink3)}
+.stitle{font-size:12px;font-weight:600;color:var(--ink3);letter-spacing:.5px;margin-bottom:10px;text-transform:uppercase}
+.tw{background:var(--paper);border:1px solid var(--border);overflow-x:auto;margin-bottom:18px}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead tr{background:var(--ink);border-bottom:2px solid var(--ink)}
+th{padding:9px 13px;text-align:left;font-size:10px;color:rgba(255,255,255,.6);letter-spacing:.8px;text-transform:uppercase;font-weight:600}
+td{padding:9px 13px;color:var(--ink2);border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(200,66,10,.03)}
+.tdm{color:var(--ink);font-weight:600}
+.badge{display:inline-block;padding:2px 8px;font-size:10px;font-weight:600}
+.bg{background:#d4edda;color:#155724}.br{background:#fde8e8;color:#8b1a1a}.by{background:#fff3cd;color:#664d03}.bgr{background:#e9e9e9;color:#555}
+.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.inp{padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;border:1px solid var(--border);background:var(--paper);color:var(--ink);outline:none}
+.inp:focus{border-color:var(--ink)}
+.overlay{position:fixed;inset:0;background:rgba(26,26,24,.6);display:flex;align-items:center;justify-content:center;z-index:500;backdrop-filter:blur(2px)}
+.modal{background:var(--paper);border:2px solid var(--ink);width:520px;max-height:90vh;overflow-y:auto;padding:28px;position:relative}
+.mt{font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid var(--ink)}
+.mc{position:absolute;top:14px;right:14px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--ink3)}
+.mc:hover{color:var(--accent)}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg-full{grid-column:1/-1}
+.fl{font-size:10px;color:var(--ink3);letter-spacing:.6px;text-transform:uppercase;display:block;margin-bottom:4px;font-weight:600}
+.fa{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
+.empty{text-align:center;padding:32px;color:var(--ink3);font-size:12px}
+.lcard{background:var(--paper);border:1px solid var(--border);padding:20px;margin-bottom:14px}
+.lrow{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:11px}
+.lrow.tot{border:none;border-top:2px solid var(--ink);margin-top:4px;font-weight:700;font-size:13px}
+.red{color:var(--accent)}
+.loading{display:flex;align-items:center;justify-content:center;height:80px;font-size:11px;color:var(--ink3);gap:10px}
+.spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--green);color:#fff;padding:10px 16px;font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:600;opacity:0;transition:opacity .3s;z-index:999;pointer-events:none}
+.toast.show{opacity:1}
+.sync-bar{display:flex;align-items:center;gap:6px;font-size:10px;color:rgba(255,255,255,.3);padding:8px 18px;border-top:1px solid rgba(255,255,255,.06)}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.sync-dot.off{background:var(--accent);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBXeFV7uLx5Qm9vwPB-nhYsSPL0SCtVyCQ",
+  authDomain: "inmobiliaria-eckerdt.firebaseapp.com",
+  projectId: "inmobiliaria-eckerdt",
+  storageBucket: "inmobiliaria-eckerdt.firebasestorage.app",
+  messagingSenderId: "1047209623065",
+  appId: "1:1047209623065:web:c655f682cc895a852fb488"
+};
+
+const fireApp = initializeApp(firebaseConfig);
+const db = getFirestore(fireApp);
+
+// ── Estado global ──────────────────────────────────────────────────────────────
+let S = {
+  seccion: 'dashboard',
+  propietarios: [], propiedades: [], contratos: [], pagos: [],
+  modal: null, form: {},
+  filtros: { buscar:'', estado:'todos' },
+  liqMes: '',
+  synced: false,
+  loading: true,
+};
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const moneda = n => '$' + Math.round(n||0).toLocaleString('es-AR');
+const hoy = () => new Date().toISOString().split('T')[0];
+const diasPara = fin => Math.round((new Date(fin) - new Date()) / 86400000);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+
+function toast(msg, ok=true) {
+  const t = $('toast');
+  t.textContent = (ok ? '✓ ' : '⚠ ') + msg;
+  t.style.background = ok ? '#2a6b3c' : '#c8420a';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function badge(e) {
+  const m = {activo:'bg Activo',cobrado:'bg Cobrado',pendiente:'by Pendiente',vencido:'br Vencido'};
+  const [c,l] = (m[e]||'bgr '+e).split(' ');
+  return `<span class="badge ${c}">${l}</span>`;
+}
+
+// ── Firebase CRUD ──────────────────────────────────────────────────────────────
+async function fbAdd(col, data) {
+  try {
+    const ref = await addDoc(collection(db, col), {...data, _ts: Date.now()});
+    toast('Guardado en la nube');
+    return ref.id;
+  } catch(e) { toast('Error al guardar: ' + e.message, false); return null; }
+}
+
+async function fbUpdate(col, id, data) {
+  try {
+    await updateDoc(doc(db, col, id), {...data, _ts: Date.now()});
+    toast('Actualizado');
+  } catch(e) { toast('Error: ' + e.message, false); }
+}
+
+// ── Cargar datos iniciales ─────────────────────────────────────────────────────
+async function cargarTodo() {
+  S.loading = true; render();
+  try {
+    const cols = ['propietarios','propiedades','contratos','pagos'];
+    for (const col of cols) {
+      const snap = await getDocs(collection(db, col));
+      S[col] = snap.docs.map(d => ({...d.data(), _id: d.id}));
+    }
+    // Cargar datos demo si está vacío
+    if (S.propietarios.length === 0) await cargarDemo();
+    if (S.pagos.length > 0) {
+      const meses = [...new Set(S.pagos.map(p=>p.mes))].sort().reverse();
+      S.liqMes = meses[0] || '';
+    }
+    S.synced = true;
+  } catch(e) {
+    toast('Error conectando con Firebase: ' + e.message, false);
+  }
+  S.loading = false; render();
+}
+
+async function cargarDemo() {
+  const props = [
+    {id:'p1',nombre:'Carlos Méndez',telefono:'3442-412345',email:'carlos@email.com'},
+    {id:'p2',nombre:'Ana Fernández',telefono:'3442-567890',email:'ana@email.com'},
+    {id:'p3',nombre:'Luis Rodríguez',telefono:'3442-998877',email:'luis@email.com'},
+  ];
+  const propis = [
+    {id:'pr1',propietarioId:'p1',direccion:'Mitre 320',tipo:'Casa',descripcion:'3 dorm.'},
+    {id:'pr2',propietarioId:'p1',direccion:'San Martín 145 1°A',tipo:'Dpto',descripcion:'2 dorm.'},
+    {id:'pr3',propietarioId:'p2',direccion:'Rivadavia 890',tipo:'Local',descripcion:'60m²'},
+    {id:'pr4',propietarioId:'p3',direccion:'Belgrano 210',tipo:'Casa',descripcion:'2 dorm.'},
+  ];
+  const conts = [
+    {id:'c1',propiedadId:'pr1',inquilino:'Martín Suárez',dni:'32.111.222',telefono:'3442-111222',email:'martin@gmail.com',inicio:'2024-01-01',fin:'2025-12-31',alquilerBase:180000,comisionAgencia:5,estado:'activo',garantia:'Personal - Roberto Suárez'},
+    {id:'c2',propiedadId:'pr2',inquilino:'Sofía Torres',dni:'35.444.555',telefono:'3442-444555',email:'sofia@gmail.com',inicio:'2024-06-01',fin:'2026-05-31',alquilerBase:220000,comisionAgencia:5,estado:'activo',garantia:'Inmueble - Sarmiento 400'},
+    {id:'c3',propiedadId:'pr3',inquilino:'Comercial Perez SA',dni:'30-71234567-9',telefono:'3442-777888',email:'comercial@perez.com',inicio:'2023-03-01',fin:'2026-06-15',alquilerBase:350000,comisionAgencia:8,estado:'activo',garantia:'Seguro de caución'},
+  ];
+  const pagos = [
+    {id:'pg1',contratoId:'c1',mes:'Mayo 2025',monto:195000,fecha:'2025-05-05',estado:'cobrado',comprobante:'REC-001'},
+    {id:'pg2',contratoId:'c1',mes:'Abril 2025',monto:195000,fecha:'2025-04-03',estado:'cobrado',comprobante:'REC-002'},
+    {id:'pg3',contratoId:'c2',mes:'Mayo 2025',monto:235000,fecha:null,estado:'pendiente',comprobante:''},
+    {id:'pg4',contratoId:'c3',mes:'Mayo 2025',monto:385000,fecha:null,estado:'vencido',comprobante:''},
+    {id:'pg5',contratoId:'c3',mes:'Abril 2025',monto:375000,fecha:null,estado:'vencido',comprobante:''},
+  ];
+  for (const x of props) { const ref = await addDoc(collection(db,'propietarios'),x); S.propietarios.push({...x,_id:ref.id}); }
+  for (const x of propis) { const ref = await addDoc(collection(db,'propiedades'),x); S.propiedades.push({...x,_id:ref.id}); }
+  for (const x of conts) { const ref = await addDoc(collection(db,'contratos'),x); S.contratos.push({...x,_id:ref.id}); }
+  for (const x of pagos) { const ref = await addDoc(collection(db,'pagos'),x); S.pagos.push({...x,_id:ref.id}); }
+  S.liqMes = 'Mayo 2025';
+  toast('Datos de ejemplo cargados');
+}
+
+// ── Acciones ───────────────────────────────────────────────────────────────────
+window.go = s => { S.seccion=s; S.modal=null; S.filtros={buscar:'',estado:'todos'}; render(); };
+window.openModal = t => { S.modal=t; S.form={comisionAgencia:'5',estado:'activo',tipo:'Casa'}; render(); };
+window.closeModal = () => { S.modal=null; render(); };
+
+window.guardarContrato = async () => {
+  const f = S.form;
+  if (!f.propiedadId||!f.inquilino||!f.inicio) return toast('Completá los campos obligatorios',false);
+  const data = {...f, propiedadId:f.propiedadId, alquilerBase:+(f.alquilerBase||0), comisionAgencia:+(f.comisionAgencia||5), estado:'activo'};
+  const id = await fbAdd('contratos', data);
+  if(id) { S.contratos.unshift({...data,_id:id}); S.modal=null; render(); }
+};
+
+window.guardarPago = async () => {
+  const f = S.form;
+  if (!f.contratoId||!f.mes) return toast('Completá los campos obligatorios',false);
+  const data = {...f, contratoId:f.contratoId, monto:+(f.monto||0)};
+  const id = await fbAdd('pagos', data);
+  if(id) { S.pagos.unshift({...data,_id:id}); S.modal=null; render(); }
+};
+
+window.guardarPropietario = async () => {
+  const f = S.form;
+  if (!f.nombre) return toast('Ingresá el nombre',false);
+  const id = await fbAdd('propietarios', f);
+  if(id) { S.propietarios.push({...f,_id:id}); S.modal=null; render(); }
+};
+
+window.guardarPropiedad = async () => {
+  const f = S.form;
+  if (!f.propietarioId||!f.direccion) return toast('Completá los campos obligatorios',false);
+  const id = await fbAdd('propiedades', f);
+  if(id) { S.propiedades.push({...f,_id:id}); S.modal=null; render(); }
+};
+
+window.cobrar = async (fid) => {
+  const p = S.pagos.find(x=>x._id===fid);
+  if(!p) return;
+  const upd = {estado:'cobrado', fecha:hoy()};
+  await fbUpdate('pagos', fid, upd);
+  S.pagos = S.pagos.map(x=>x._id===fid?{...x,...upd}:x);
+  render();
+};
+
+window.setFiltro = (k,v) => { S.filtros[k]=v; render(); };
+window.setLiqMes = v => { S.liqMes=v; render(); };
+
+// ── Render ─────────────────────────────────────────────────────────────────────
+function renderDashboard() {
+  const activos = S.contratos.filter(c=>c.estado==='activo');
+  const totalAlq = activos.reduce((s,c)=>s+c.alquilerBase,0);
+  const totalCom = activos.reduce((s,c)=>s+(c.alquilerBase*c.comisionAgencia/100),0);
+  const pend = S.pagos.filter(p=>p.estado==='pendiente'||p.estado==='vencido');
+  const montoPend = pend.reduce((s,p)=>s+p.monto,0);
+
+  const alertas = [];
+  activos.forEach(c=>{
+    const d=diasPara(c.fin);
+    const pr=S.propiedades.find(p=>p.id===c.propiedadId||p._id===c.propiedadId);
+    if(d<=0) alertas.push({col:'var(--accent)',t:`Contrato vencido: ${pr?.direccion||''}`,s:`${c.inquilino} · Venció el ${c.fin}`});
+    else if(d<=60) alertas.push({col:'var(--warn)',t:`Por vencer: ${pr?.direccion||''}`,s:`${c.inquilino} · Vence en ${d} días`});
+  });
+  S.pagos.filter(p=>p.estado==='vencido').forEach(p=>{
+    const c=S.contratos.find(x=>x.id===p.contratoId||x._id===p.contratoId);
+    const pr=c?S.propiedades.find(x=>x.id===c.propiedadId||x._id===c.propiedadId):null;
+    alertas.push({col:'var(--accent)',t:`Pago vencido: ${pr?.direccion||''}`,s:`${c?.inquilino||''} · ${p.mes} · ${moneda(p.monto)}`});
+  });
+
+  const ultPagos = S.pagos.slice(0,6).map(p=>{
+    const c=S.contratos.find(x=>x.id===p.contratoId||x._id===p.contratoId);
+    const pr=c?S.propiedades.find(x=>x.id===c.propiedadId||x._id===c.propiedadId):null;
+    return `<tr><td class="tdm">${c?.inquilino||''}</td><td>${pr?.direccion||''}</td><td>${p.mes}</td><td>${moneda(p.monto)}</td><td>${badge(p.estado)}</td><td>${p.fecha||'—'}</td></tr>`;
+  }).join('');
+
+  return `
+  <div class="kgrid">
+    <div class="kcard" style="border-top-color:var(--green)"><div class="klbl">Contratos activos</div><div class="kval">${activos.length}</div><div class="ksub">de ${S.contratos.length} totales</div></div>
+    <div class="kcard" style="border-top-color:var(--ink)"><div class="klbl">Alquileres / mes</div><div class="kval" style="font-size:17px">${moneda(totalAlq)}</div><div class="ksub">cartera activa</div></div>
+    <div class="kcard" style="border-top-color:var(--accent)"><div class="klbl">Comisiones / mes</div><div class="kval" style="font-size:17px">${moneda(totalCom)}</div><div class="ksub">honorarios agencia</div></div>
+    <div class="kcard" style="border-top-color:var(--warn)"><div class="klbl">Saldo pendiente</div><div class="kval" style="font-size:17px">${moneda(montoPend)}</div><div class="ksub">${pend.length} cuota(s)</div></div>
+  </div>
+  ${alertas.length?`<div class="stitle">Alertas</div><div class="alerts">${alertas.map(a=>`<div class="alert" style="border-left-color:${a.col}"><div><strong>${a.t}</strong><span>${a.s}</span></div></div>`).join('')}</div>`:''}
+  <div class="stitle">Últimos movimientos</div>
+  <div class="tw"><table><thead><tr><th>Inquilino</th><th>Propiedad</th><th>Período</th><th>Monto</th><th>Estado</th><th>Fecha</th></tr></thead><tbody>${ultPagos||'<tr><td colspan=6><div class="empty">Sin movimientos</div></td></tr>'}</tbody></table></div>`;
+}
+
+function renderContratos() {
+  const f = S.filtros;
+  const lista = S.contratos.filter(c=>{
+    const bOk = c.inquilino?.toLowerCase().includes(f.buscar.toLowerCase());
+    const eOk = f.estado==='todos'||c.estado===f.estado;
+    return bOk&&eOk;
+  });
+  const rows = lista.map(c=>{
+    const pr=S.propiedades.find(p=>p.id===c.propiedadId||p._id===c.propiedadId);
+    const ow=pr?S.propietarios.find(o=>o.id===pr.propietarioId||o._id===pr.propietarioId):null;
+    const d=diasPara(c.fin);
+    const dc=d<0?'var(--accent)':d<60?'var(--warn)':'var(--ink3)';
+    const dt=d<0?`${Math.abs(d)}d vencido`:`${d}d`;
+    return `<tr><td class="tdm">${c.inquilino}</td><td>${pr?.direccion||''} <span style="color:var(--ink3);font-size:10px">(${pr?.tipo||''})</span></td><td>${ow?.nombre||''}</td><td>${moneda(c.alquilerBase)}</td><td>${c.comisionAgencia}%</td><td>${c.inicio}</td><td>${c.fin}</td><td style="color:${dc}">${dt}</td><td>${badge(c.estado)}</td></tr>`;
+  }).join('');
+  const propOpts = S.propiedades.map(p=>`<option value="${p.id||p._id}">${p.direccion} — ${p.tipo}</option>`).join('');
+  return `
+  <div class="filters">
+    <input class="inp" placeholder="Buscar inquilino..." value="${f.buscar}" oninput="setFiltro('buscar',this.value)" style="min-width:180px">
+    <select class="inp" onchange="setFiltro('estado',this.value)">
+      <option value="todos">Todos</option><option value="activo">Activos</option><option value="vencido">Vencidos</option>
+    </select>
+    <button class="btn" onclick="openModal('contrato')">+ Nuevo contrato</button>
+  </div>
+  <div class="tw"><table><thead><tr><th>Inquilino</th><th>Propiedad</th><th>Propietario</th><th>Alquiler</th><th>Com%</th><th>Inicio</th><th>Fin</th><th>Días</th><th>Estado</th></tr></thead><tbody>${rows||'<tr><td colspan=9><div class="empty">Sin resultados</div></td></tr>'}</tbody></table></div>`;
+}
+
+function renderPagos() {
+  const f = S.filtros;
+  const lista = S.pagos.filter(p=>f.estado==='todos'||p.estado===f.estado);
+  const rows = lista.map(p=>{
+    const c=S.contratos.find(x=>x.id===p.contratoId||x._id===p.contratoId);
+    const pr=c?S.propiedades.find(x=>x.id===c.propiedadId||x._id===c.propiedadId):null;
+    const btn=(p.estado==='pendiente'||p.estado==='vencido')?`<button class="btn sm grn" onclick="cobrar('${p._id}')">✓ Cobrar</button>`:'';
+    return `<tr><td class="tdm">${c?.inquilino||''}</td><td>${pr?.direccion||''}</td><td>${p.mes}</td><td>${moneda(p.monto)}</td><td>${badge(p.estado)}</td><td>${p.fecha||'—'}</td><td style="font-size:10px;color:var(--ink3)">${p.comprobante||'—'}</td><td>${btn}</td></tr>`;
+  }).join('');
+  return `
+  <div class="filters">
+    <select class="inp" onchange="setFiltro('estado',this.value)">
+      <option value="todos">Todos</option><option value="cobrado">Cobrados</option><option value="pendiente">Pendientes</option><option value="vencido">Vencidos</option>
+    </select>
+    <button class="btn" onclick="openModal('pago')">+ Registrar pago</button>
+  </div>
+  <div class="tw"><table><thead><tr><th>Inquilino</th><th>Propiedad</th><th>Período</th><th>Monto</th><th>Estado</th><th>Fecha</th><th>Comprobante</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan=8><div class="empty">Sin registros</div></td></tr>'}</tbody></table></div>`;
+}
+
+function renderLiquidaciones() {
+  const meses = [...new Set(S.pagos.map(p=>p.mes))].sort().reverse();
+  const mes = S.liqMes || meses[0] || '';
+  const pagosMes = S.pagos.filter(p=>p.mes===mes&&p.estado==='cobrado');
+  const cards = pagosMes.map(p=>{
+    const c=S.contratos.find(x=>x.id===p.contratoId||x._id===p.contratoId);
+    const pr=c?S.propiedades.find(x=>x.id===c.propiedadId||x._id===c.propiedadId):null;
+    const ow=pr?S.propietarios.find(x=>x.id===pr.propietarioId||x._id===pr.propietarioId):null;
+    const com=Math.round(p.monto*(c?.comisionAgencia||5)/100);
+    const neto=p.monto-com;
+    return `<div class="lcard">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div><div style="font-size:13px;font-weight:600">${pr?.direccion||''} <span style="font-size:11px;font-weight:400;color:var(--ink3)">(${pr?.tipo||''})</span></div>
+        <div style="font-size:10px;color:var(--ink3);margin-top:2px">Propietario: ${ow?.nombre||''} · Inquilino: ${c?.inquilino||''}</div></div>
+        ${badge('cobrado')}
+      </div>
+      <div class="lrow"><span>Alquiler cobrado (${p.mes})</span><span>${moneda(p.monto)}</span></div>
+      <div class="lrow red"><span>Comisión agencia (${c?.comisionAgencia||5}%)</span><span>— ${moneda(com)}</span></div>
+      <div class="lrow tot"><span>A transferir al propietario</span><span>${moneda(neto)}</span></div>
+    </div>`;
+  }).join('');
+  const totB=pagosMes.reduce((s,p)=>s+p.monto,0);
+  const totC=pagosMes.reduce((s,p)=>{const c=S.contratos.find(x=>x.id===p.contratoId||x._id===p.contratoId);return s+Math.round(p.monto*(c?.comisionAgencia||5)/100);},0);
+  const resumen=pagosMes.length>1?`<div class="lcard" style="background:var(--ink);color:#fff">
+    <div class="lrow" style="color:rgba(255,255,255,.6)"><span>Total cobrado</span><span>${moneda(totB)}</span></div>
+    <div class="lrow" style="color:#f08060"><span>Total comisiones agencia</span><span>— ${moneda(totC)}</span></div>
+    <div class="lrow tot" style="color:#fff;border-top-color:rgba(255,255,255,.3)"><span>Total a transferir propietarios</span><span>${moneda(totB-totC)}</span></div>
+  </div>`:'';
+  return `
+  <div class="filters" style="margin-bottom:18px">
+    <select class="inp" onchange="setLiqMes(this.value)">
+      ${meses.map(m=>`<option value="${m}" ${m===mes?'selected':''}>${m}</option>`).join('')}
+    </select>
+    <span style="font-size:11px;color:var(--ink3)">${pagosMes.length} liquidación(es) · Ingresos agencia: <strong>${moneda(totC)}</strong></span>
+  </div>
+  ${cards||'<div class="empty">Sin pagos cobrados en este período</div>'}${resumen}`;
+}
+
+function renderPropietarios() {
+  const rows = S.propietarios.map(o=>{
+    const props=S.propiedades.filter(p=>p.propietarioId===o.id||p.propietarioId===o._id);
+    const activos=props.filter(p=>S.contratos.some(c=>(c.propiedadId===p.id||c.propiedadId===p._id)&&c.estado==='activo')).length;
+    const plist=props.map(p=>`<span style="display:block;font-size:10px">${p.direccion} (${p.tipo})</span>`).join('');
+    return `<tr><td class="tdm">${o.nombre}</td><td>${o.telefono||'—'}</td><td>${o.email||'—'}</td><td>${plist||'—'}</td><td>${activos}</td></tr>`;
+  }).join('');
+  return `
+  <div class="filters">
+    <button class="btn" onclick="openModal('propietario')">+ Propietario</button>
+    <button class="btn out" onclick="openModal('propiedad')">+ Propiedad</button>
+  </div>
+  <div class="tw"><table><thead><tr><th>Propietario</th><th>Teléfono</th><th>Email</th><th>Propiedades</th><th>Activos</th></tr></thead><tbody>${rows||'<tr><td colspan=5><div class="empty">Sin propietarios</div></td></tr>'}</tbody></table></div>`;
+}
+
+function renderModal() {
+  if(!S.modal) return '';
+  let content='';
+  if(S.modal==='contrato') {
+    const opts=S.propiedades.map(p=>`<option value="${p.id||p._id}">${p.direccion} — ${p.tipo}</option>`).join('');
+    content=`<div class="mt">Nuevo Contrato</div><div class="fg">
+      <div class="fg-full"><label class="fl">Propiedad *</label><select class="inp" style="width:100%" onchange="S.form.propiedadId=this.value"><option value="">Seleccionar...</option>${opts}</select></div>
+      <div class="fg-full"><label class="fl">Inquilino *</label><input class="inp" style="width:100%" oninput="S.form.inquilino=this.value"></div>
+      <div><label class="fl">DNI / CUIT</label><input class="inp" style="width:100%" oninput="S.form.dni=this.value"></div>
+      <div><label class="fl">Teléfono</label><input class="inp" style="width:100%" oninput="S.form.telefono=this.value"></div>
+      <div class="fg-full"><label class="fl">Email</label><input class="inp" style="width:100%" type="email" oninput="S.form.email=this.value"></div>
+      <div><label class="fl">Fecha inicio *</label><input class="inp" style="width:100%" type="date" oninput="S.form.inicio=this.value"></div>
+      <div><label class="fl">Fecha fin</label><input class="inp" style="width:100%" type="date" oninput="S.form.fin=this.value"></div>
+      <div><label class="fl">Alquiler base ($)</label><input class="inp" style="width:100%" type="number" oninput="S.form.alquilerBase=this.value"></div>
+      <div><label class="fl">Comisión agencia (%)</label><input class="inp" style="width:100%" type="number" value="5" oninput="S.form.comisionAgencia=this.value"></div>
+      <div class="fg-full"><label class="fl">Garantía</label><input class="inp" style="width:100%" oninput="S.form.garantia=this.value"></div>
+    </div><div class="fa"><button class="btn out" onclick="closeModal()">Cancelar</button><button class="btn grn" onclick="guardarContrato()">Guardar contrato</button></div>`;
+  }
+  if(S.modal==='pago') {
+    const opts=S.contratos.filter(c=>c.estado==='activo').map(c=>{const p=S.propiedades.find(x=>x.id===c.propiedadId||x._id===c.propiedadId);return `<option value="${c.id||c._id}">${c.inquilino} — ${p?.direccion||''}</option>`;}).join('');
+    content=`<div class="mt">Registrar Pago</div><div class="fg">
+      <div class="fg-full"><label class="fl">Contrato *</label><select class="inp" style="width:100%" onchange="S.form.contratoId=this.value"><option value="">Seleccionar...</option>${opts}</select></div>
+      <div><label class="fl">Período (ej: Junio 2025) *</label><input class="inp" style="width:100%" oninput="S.form.mes=this.value"></div>
+      <div><label class="fl">Monto ($)</label><input class="inp" style="width:100%" type="number" oninput="S.form.monto=this.value"></div>
+      <div><label class="fl">Fecha cobro</label><input class="inp" style="width:100%" type="date" value="${hoy()}" oninput="S.form.fecha=this.value"></div>
+      <div><label class="fl">Estado</label><select class="inp" style="width:100%" onchange="S.form.estado=this.value"><option value="cobrado">Cobrado</option><option value="pendiente">Pendiente</option><option value="vencido">Vencido</option></select></div>
+      <div><label class="fl">N° Comprobante</label><input class="inp" style="width:100%" oninput="S.form.comprobante=this.value"></div>
+    </div><div class="fa"><button class="btn out" onclick="closeModal()">Cancelar</button><button class="btn grn" onclick="guardarPago()">Guardar</button></div>`;
+  }
+  if(S.modal==='propietario') {
+    content=`<div class="mt">Nuevo Propietario</div><div class="fg">
+      <div class="fg-full"><label class="fl">Nombre *</label><input class="inp" style="width:100%" oninput="S.form.nombre=this.value"></div>
+      <div><label class="fl">Teléfono</label><input class="inp" style="width:100%" oninput="S.form.telefono=this.value"></div>
+      <div><label class="fl">Email</label><input class="inp" style="width:100%" oninput="S.form.email=this.value"></div>
+    </div><div class="fa"><button class="btn out" onclick="closeModal()">Cancelar</button><button class="btn grn" onclick="guardarPropietario()">Guardar</button></div>`;
+  }
+  if(S.modal==='propiedad') {
+    const opts=S.propietarios.map(o=>`<option value="${o.id||o._id}">${o.nombre}</option>`).join('');
+    content=`<div class="mt">Nueva Propiedad</div><div class="fg">
+      <div class="fg-full"><label class="fl">Propietario *</label><select class="inp" style="width:100%" onchange="S.form.propietarioId=this.value"><option value="">Seleccionar...</option>${opts}</select></div>
+      <div class="fg-full"><label class="fl">Dirección *</label><input class="inp" style="width:100%" oninput="S.form.direccion=this.value"></div>
+      <div><label class="fl">Tipo</label><select class="inp" style="width:100%" onchange="S.form.tipo=this.value"><option>Casa</option><option>Dpto</option><option>Local</option><option>Campo</option><option>Oficina</option></select></div>
+      <div><label class="fl">Descripción</label><input class="inp" style="width:100%" oninput="S.form.descripcion=this.value"></div>
+    </div><div class="fa"><button class="btn out" onclick="closeModal()">Cancelar</button><button class="btn grn" onclick="guardarPropiedad()">Guardar</button></div>`;
+  }
+  return `<div class="overlay" onclick="if(event.target===this)closeModal()"><div class="modal"><button class="mc" onclick="closeModal()">✕</button>${content}</div></div>`;
+}
+
+function render() {
+  const NAVS = [
+    {id:'dashboard',ic:'▦',lbl:'Dashboard'},
+    {id:'contratos',ic:'◻',lbl:'Contratos'},
+    {id:'pagos',ic:'$',lbl:'Pagos / Cobranza'},
+    {id:'liquidaciones',ic:'≡',lbl:'Liquidaciones'},
+    {id:'propietarios',ic:'◉',lbl:'Propietarios'},
+  ];
+  const TITLES = {
+    dashboard:['Resumen general','Vista general de la cartera'],
+    contratos:['Contratos','Registro y seguimiento de contratos'],
+    pagos:['Pagos y Cobranza','Control de pagos de inquilinos'],
+    liquidaciones:['Liquidaciones','Liquidación mensual a propietarios'],
+    propietarios:['Propietarios y Propiedades','Gestión del padrón'],
+  };
+  const [pt,ps] = TITLES[S.seccion];
+
+  let body = '';
+  if(S.loading) {
+    body = `<div class="loading"><div class="spinner"></div>Conectando con Firebase...</div>`;
+  } else if(S.seccion==='dashboard') body=renderDashboard();
+  else if(S.seccion==='contratos') body=renderContratos();
+  else if(S.seccion==='pagos') body=renderPagos();
+  else if(S.seccion==='liquidaciones') body=renderLiquidaciones();
+  else if(S.seccion==='propietarios') body=renderPropietarios();
+
+  $('app').innerHTML = `
+  <div class="app">
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="logo-t">Eckerdt<br>Inmobiliaria</div>
+        <div class="logo-s">Urdinarrain · ER</div>
+      </div>
+      <ul class="nav">
+        ${NAVS.map(n=>`<li class="${S.seccion===n.id?'on':''}" onclick="go('${n.id}')"><span class="ic">${n.ic}</span>${n.lbl}</li>`).join('')}
+      </ul>
+      <div class="sync-bar">
+        <div class="sync-dot ${S.synced?'':'off'}"></div>
+        ${S.synced?'Sincronizado con Firebase':'Conectando...'}
+      </div>
+      <div class="sidebar-foot">Eckerdt Inmobiliaria · 2025</div>
+    </aside>
+    <main class="main">
+      <div class="ph">
+        <div><div class="pt">${pt}</div><div class="ps">${ps}</div></div>
+      </div>
+      ${body}
+    </main>
+  </div>
+  ${renderModal()}`;
+}
+
+// Arrancar
+render();
+cargarTodo();
+</script>
+</body>
+</html>
