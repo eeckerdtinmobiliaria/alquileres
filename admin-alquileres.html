@@ -384,7 +384,7 @@ function renderContratos(){
     const dt=d<0?`${Math.abs(d)}d vencido`:`${d}d`;
     const extrasHtml=(c.extras||[]).map(e=>`<span class="tag">${e.desc}</span>`).join('');
     let updHtml='';
-    if(c.frecActualizacion){ const base=new Date(c.ultimaActualizacion||c.inicio||'2024-01-01'); const prox=new Date(base); prox.setMonth(prox.getMonth()++(c.frecActualizacion)); const du=Math.round((prox-new Date())/86400000); if(du<=30) updHtml=`<span class="upd-badge">⟳ ${du<0?`${Math.abs(du)}d atrasada`:`${du}d`}</span>`; }
+    if(c.frecActualizacion){ const base=new Date(c.ultimaActualizacion||c.inicio||'2024-01-01'); const prox=new Date(base); prox.setMonth(prox.getMonth()+(+(c.frecActualizacion||6))); const du=Math.round((prox-new Date())/86400000); if(du<=30) updHtml=`<span class="upd-badge">⟳ ${du<0?`${Math.abs(du)}d atrasada`:`${du}d`}</span>`; }
     return `<tr><td class="tdm">${c.inquilino}<br><span class="tds">${c.dni||''}</span></td><td>${c.direccion||''}<br><span class="tds">${c.propietarioNombre||''}</span></td><td>${moneda(c.alquilerBase)}<br><span class="tds">${c.comisionAgencia||5}% com.</span></td><td>${extrasHtml||'<span class="tds">—</span>'}</td><td>${c.inicio||''}<br><span style="color:${dc};font-size:10px">${dt}</span></td><td>${updHtml||`<span class="tds">c/${c.frecActualizacion||6}m</span>`}</td><td>${badge(c.estado)}</td><td><button class="btn sm" onclick="actualizarAlquiler('${c._id}')">⟳ IPC</button></td></tr>`;
   }).join('');
   return `
